@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Details - Smart Contract Audit System</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Custom Styles -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .code-block {
+            font-family: 'Courier New', Courier, monospace;
+        }
+    </style>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <a href="index.html" class="text-2xl font-bold text-primary-600">SCAS</a>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="index.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Dashboard
+                        </a>
+                        <a href="audits.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Audits
+                        </a>
+                        <a href="reports.html" class="border-primary-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Reports
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <button id="user-menu-button" class="flex items-center text-gray-700">
+                        <i class="fas fa-user-circle text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Back Button -->
+        <div class="mb-4">
+            <a href="reports.html" class="text-primary-600 hover:text-primary-900 flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Back to Reports
+            </a>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading-state" class="text-center py-12">
+            <i class="fas fa-spinner fa-spin text-primary-600 text-4xl"></i>
+        </div>
+
+        <!-- Content (hidden while loading) -->
+        <div id="content" class="hidden">
+            <!-- Header -->
+            <div class="bg-white shadow rounded-lg mb-6">
+                <div class="px-4 py-5 sm:px-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h2 id="contract-name" class="text-2xl font-bold text-gray-900"></h2>
+                            <p id="contract-address" class="mt-1 text-sm text-gray-600"></p>
+                        </div>
+                        <div class="flex space-x-3">
+                            <span id="risk-level-badge" class="px-3 py-1 rounded-full text-sm font-semibold"></span>
+                            <span id="status-badge" class="px-3 py-1 rounded-full text-sm font-semibold"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Summary -->
+            <div class="bg-white shadow rounded-lg mb-6">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Report Summary</h3>
+                    <div id="summary" class="prose max-w-none"></div>
+                </div>
+            </div>
+
+            <!-- Findings -->
+            <div class="bg-white shadow rounded-lg mb-6">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Findings</h3>
+                    <div id="findings" class="prose max-w-none"></div>
+                </div>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="bg-white shadow rounded-lg mb-6">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Recommendations</h3>
+                    <div id="recommendations" class="prose max-w-none"></div>
+                </div>
+            </div>
+
+            <!-- Detailed Analysis -->
+            <div class="bg-white shadow rounded-lg mb-6">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Detailed Analysis</h3>
+                    <div id="detailed-analysis" class="prose max-w-none"></div>
+                </div>
+            </div>
+
+            <!-- Admin Actions -->
+            <div id="admin-actions" class="bg-white shadow rounded-lg mb-6 hidden">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Admin Actions</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="status-update" class="block text-sm font-medium text-gray-700">Update Status</label>
+                            <div class="mt-1 flex space-x-3">
+                                <select id="status-update" class="flex-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md">
+                                    <option value="draft">Draft</option>
+                                    <option value="pending_review">Pending Review</option>
+                                    <option value="approved">Approved</option>
+                                    <option value="rejected">Rejected</option>
+                                </select>
+                                <button id="update-status-btn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700">
+                                    Update Status
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Metadata -->
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Report Information</h3>
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Generated By</p>
+                            <p id="generated-by" class="mt-1 text-sm text-gray-900"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Generated At</p>
+                            <p id="generated-at" class="mt-1 text-sm text-gray-900"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Report Version</p>
+                            <p id="version" class="mt-1 text-sm text-gray-900"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Report Type</p>
+                            <p id="report-type" class="mt-1 text-sm text-gray-900"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="../src/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Check authentication
+            if (!AuthService.checkAuth()) return;
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const reportId = urlParams.get('id');
+
+            if (!reportId) {
+                window.location.href = 'reports.html';
+                return;
+            }
+
+            try {
+                // Load report details
+                const report = await ApiService.get(API_ENDPOINTS.reports.get(reportId));
+                
+                // Hide loading state and show content
+                document.getElementById('loading-state').classList.add('hidden');
+                document.getElementById('content').classList.remove('hidden');
+
+                // Update UI with report details
+                document.getElementById('contract-name').textContent = report.audit.contract_name;
+                document.getElementById('contract-address').textContent = report.audit.contract_address;
+                
+                // Update risk level badge
+                const riskBadge = document.getElementById('risk-level-badge');
+                riskBadge.textContent = report.risk_level;
+                riskBadge.className = `px-3 py-1 rounded-full text-sm font-semibold ${getRiskLevelColor(report.risk_level)}`;
+
+                // Update status badge
+                const statusBadge = document.getElementById('status-badge');
+                statusBadge.textContent = report.status;
+                statusBadge.className = `px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(report.status)}`;
+
+                // Update content sections
+                document.getElementById('summary').innerHTML = report.summary;
+                document.getElementById('findings').innerHTML = report.findings;
+                document.getElementById('recommendations').innerHTML = report.recommendations;
+                document.getElementById('detailed-analysis').innerHTML = report.detailed_analysis;
+
+                // Update metadata
+                document.getElementById('generated-by').textContent = report.generated_by_name;
+                document.getElementById('generated-at').textContent = UIUtils.formatDate(report.generated_at);
+                document.getElementById('version').textContent = `v${report.version}`;
+                document.getElementById('report-type').textContent = report.report_type;
+
+                // Show admin actions if user is admin
+                if (AuthService.isAdmin()) {
+                    const adminActions = document.getElementById('admin-actions');
+                    adminActions.classList.remove('hidden');
+                    document.getElementById('status-update').value = report.status;
+
+                    // Setup status update handler
+                    document.getElementById('update-status-btn').addEventListener('click', async () => {
+                        try {
+                            const status = document.getElementById('status-update').value;
+                            await ApiService.put(API_ENDPOINTS.reports.updateStatus(reportId), { status });
+                            UIUtils.showAlert('Status updated successfully', 'success');
+                            location.reload();
+                        } catch (error) {
+                            UIUtils.showAlert(error.message, 'error');
+                        }
+                    });
+                }
+
+            } catch (error) {
+                UIUtils.showAlert(error.message, 'error');
+            }
+        });
+
+        // Helper functions
+        function getRiskLevelColor(riskLevel) {
+            const colors = {
+                low: 'bg-green-100 text-green-800',
+                medium: 'bg-yellow-100 text-yellow-800',
+                high: 'bg-orange-100 text-orange-800',
+                critical: 'bg-red-100 text-red-800'
+            };
+            return colors[riskLevel] || 'bg-gray-100 text-gray-800';
+        }
+
+        function getStatusColor(status) {
+            const colors = {
+                draft: 'bg-gray-100 text-gray-800',
+                pending_review: 'bg-yellow-100 text-yellow-800',
+                approved: 'bg-green-100 text-green-800',
+                rejected: 'bg-red-100 text-red-800'
+            };
+            return colors[status] || 'bg-gray-100 text-gray-800';
+        }
+    </script>
+</body>
+</html>
