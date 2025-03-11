@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Shield background -->
+    <path d="M16 2L4 7V15C4 22.1797 9.10547 28.7109 16 30C22.8945 28.7109 28 22.1797 28 15V7L16 2Z" fill="#0EA5E9"/>
+    
+    <!-- Contract icon -->
+    <path d="M12 10H20M12 14H20M12 18H16" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Checkmark -->
+    <path d="M21 16L19 18L17 20L15 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
