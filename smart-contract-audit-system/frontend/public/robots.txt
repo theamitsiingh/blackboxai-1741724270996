@@ -1,0 +1,21 @@
+# Smart Contract Audit System robots.txt
+
+# Allow all crawlers
+User-agent: *
+
+# Disallow sensitive paths
+Disallow: /backend/
+Disallow: /uploads/
+Disallow: /config/
+Disallow: /logs/
+
+# Allow public pages
+Allow: /frontend/public/
+Allow: /index.html
+Allow: /login.html
+Allow: /register.html
+Allow: /404.html
+Allow: /500.html
+
+# Sitemap location
+Sitemap: https://your-domain.com/sitemap.xml
