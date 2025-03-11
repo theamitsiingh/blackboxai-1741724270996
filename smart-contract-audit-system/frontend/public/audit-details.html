@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Details - Smart Contract Audit System</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Custom Styles -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .code-block {
+            font-family: 'Courier New', Courier, monospace;
+        }
+    </style>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <a href="index.html" class="text-2xl font-bold text-primary-600">SCAS</a>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="index.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Dashboard
+                        </a>
+                        <a href="audits.html" class="border-primary-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Audits
+                        </a>
+                        <a href="reports.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Reports
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <button id="user-menu-button" class="flex items-center text-gray-700">
+                        <i class="fas fa-user-circle text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Back Button -->
+        <div class="mb-4">
+            <a href="audits.html" class="text-primary-600 hover:text-primary-900 flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Back to Audits
+            </a>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading-state" class="text-center py-12">
+            <i class="fas fa-spinner fa-spin text-primary-600 text-4xl"></i>
+        </div>
+
+        <!-- Content (hidden while loading) -->
+        <div id="content" class="hidden">
+            <!-- Header -->
+            <div class="bg-white shadow rounded-lg mb-6">
+                <div class="px-4 py-5 sm:px-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h2 id="contract-name" class="text-2xl font-bold text-gray-900"></h2>
+                            <p id="contract-address" class="mt-1 text-sm text-gray-600"></p>
+                        </div>
+                        <div class="flex space-x-3">
+                            <span id="status-badge" class="px-3 py-1 rounded-full text-sm font-semibold"></span>
+                            <span id="priority-badge" class="px-3 py-1 rounded-full text-sm font-semibold"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audit Details -->
+            <div class="bg-white shadow rounded-lg mb-6">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Audit Details</h3>
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Network</p>
+                            <p id="contract-network" class="mt-1 text-sm text-gray-900"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Audit Type</p>
+                            <p id="audit-type" class="mt-1 text-sm text-gray-900"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Submission Date</p>
+                            <p id="submission-date" class="mt-1 text-sm text-gray-900"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Completion Date</p>
+                            <p id="completion-date" class="mt-1 text-sm text-gray-900"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contract Source Code -->
+            <div class="bg-white shadow rounded-lg mb-6">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Contract Source Code</h3>
+                    <pre id="contract-source" class="bg-gray-50 p-4 rounded-md overflow-x-auto code-block text-sm"></pre>
+                </div>
+            </div>
+
+            <!-- Admin Actions (visible only to admins) -->
+            <div id="admin-actions" class="bg-white shadow rounded-lg mb-6 hidden">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Admin Actions</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="status-update" class="block text-sm font-medium text-gray-700">Update Status</label>
+                            <div class="mt-1 flex space-x-3">
+                                <select id="status-update" class="flex-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md">
+                                    <option value="pending">Pending</option>
+                                    <option value="in_progress">In Progress</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="rejected">Rejected</option>
+                                </select>
+                                <button id="update-status-btn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700">
+                                    Update Status
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="assign-to" class="block text-sm font-medium text-gray-700">Assign Audit</label>
+                            <div class="mt-1 flex space-x-3">
+                                <select id="assign-to" class="flex-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md">
+                                    <!-- Auditors will be loaded here -->
+                                </select>
+                                <button id="assign-audit-btn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700">
+                                    Assign
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audit Timeline -->
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Audit Timeline</h3>
+                    <div id="timeline" class="flow-root">
+                        <ul role="list" class="-mb-8">
+                            <!-- Timeline items will be inserted here -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="../src/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Check authentication
+            if (!AuthService.checkAuth()) return;
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const auditId = urlParams.get('id');
+
+            if (!auditId) {
+                window.location.href = 'audits.html';
+                return;
+            }
+
+            try {
+                // Load audit details
+                const audit = await ApiService.get(API_ENDPOINTS.audits.get(auditId));
+                
+                // Hide loading state and show content
+                document.getElementById('loading-state').classList.add('hidden');
+                document.getElementById('content').classList.remove('hidden');
+
+                // Update UI with audit details
+                document.getElementById('contract-name').textContent = audit.contract_name;
+                document.getElementById('contract-address').textContent = audit.contract_address;
+                document.getElementById('contract-network').textContent = audit.contract_network;
+                document.getElementById('audit-type').textContent = audit.audit_type;
+                document.getElementById('submission-date').textContent = UIUtils.formatDate(audit.submission_date);
+                document.getElementById('completion-date').textContent = audit.completion_date 
+                    ? UIUtils.formatDate(audit.completion_date) 
+                    : 'Not completed';
+                document.getElementById('contract-source').textContent = audit.contract_source;
+
+                // Update status badge
+                const statusBadge = document.getElementById('status-badge');
+                statusBadge.textContent = audit.status;
+                statusBadge.className = `px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(audit.status)}`;
+
+                // Update priority badge
+                const priorityBadge = document.getElementById('priority-badge');
+                priorityBadge.textContent = audit.priority;
+                priorityBadge.className = `px-3 py-1 rounded-full text-sm font-semibold ${getPriorityColor(audit.priority)}`;
+
+                // Show admin actions if user is admin
+                if (AuthService.isAdmin()) {
+                    document.getElementById('admin-actions').classList.remove('hidden');
+                    document.getElementById('status-update').value = audit.status;
+                    
+                    // Load auditors for assignment
+                    const auditors = await ApiService.get('/api/users?role=auditor');
+                    const assignSelect = document.getElementById('assign-to');
+                    auditors.forEach(auditor => {
+                        const option = document.createElement('option');
+                        option.value = auditor.id;
+                        option.textContent = auditor.name;
+                        if (audit.assigned_to === auditor.id) {
+                            option.selected = true;
+                        }
+                        assignSelect.appendChild(option);
+                    });
+                }
+
+                // Load and display timeline
+                const timeline = await ApiService.get(API_ENDPOINTS.audits.getTimeline(auditId));
+                const timelineContainer = document.getElementById('timeline').querySelector('ul');
+                
+                timeline.forEach((event, index) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <div class="relative pb-8">
+                            ${index !== timeline.length - 1 ? '<span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>' : ''}
+                            <div class="relative flex space-x-3">
+                                <div>
+                                    <span class="h-8 w-8 rounded-full bg-primary-500 flex items-center justify-center ring-8 ring-white">
+                                        <i class="fas fa-${getEventIcon(event.action)} text-white"></i>
+                                    </span>
+                                </div>
+                                <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                                    <div>
+                                        <p class="text-sm text-gray-500">${event.action}</p>
+                                        ${event.details ? `<p class="mt-1 text-sm text-gray-900">${event.details}</p>` : ''}
+                                    </div>
+                                    <div class="text-right text-sm whitespace-nowrap text-gray-500">
+                                        ${UIUtils.formatDate(event.created_at)}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    timelineContainer.appendChild(li);
+                });
+
+                // Setup event handlers for admin actions
+                if (AuthService.isAdmin()) {
+                    document.getElementById('update-status-btn').addEventListener('click', async () => {
+                        try {
+                            const status = document.getElementById('status-update').value;
+                            await ApiService.put(API_ENDPOINTS.audits.updateStatus(auditId), { status });
+                            UIUtils.showAlert('Status updated successfully', 'success');
+                            location.reload();
+                        } catch (error) {
+                            UIUtils.showAlert(error.message, 'error');
+                        }
+                    });
+
+                    document.getElementById('assign-audit-btn').addEventListener('click', async () => {
+                        try {
+                            const assignedTo = document.getElementById('assign-to').value;
+                            await ApiService.put(API_ENDPOINTS.audits.assign(auditId), { assigned_to: assignedTo });
+                            UIUtils.showAlert('Audit assigned successfully', 'success');
+                            location.reload();
+                        } catch (error) {
+                            UIUtils.showAlert(error.message, 'error');
+                        }
+                    });
+                }
+
+            } catch (error) {
+                UIUtils.showAlert(error.message, 'error');
+            }
+        });
+
+        // Helper functions
+        function getStatusColor(status) {
+            const colors = {
+                pending: 'bg-yellow-100 text-yellow-800',
+                in_progress: 'bg-blue-100 text-blue-800',
+                completed: 'bg-green-100 text-green-800',
+                rejected: 'bg-red-100 text-red-800'
+            };
+            return colors[status] || 'bg-gray-100 text-gray-800';
+        }
+
+        function getPriorityColor(priority) {
+            const colors = {
+                low: 'bg-green-100 text-green-800',
+                medium: 'bg-yellow-100 text-yellow-800',
+                high: 'bg-orange-100 text-orange-800',
+                critical: 'bg-red-100 text-red-800'
+            };
+            return colors[priority] || 'bg-gray-100 text-gray-800';
+        }
+
+        function getEventIcon(action) {
+            const icons = {
+                created: 'plus',
+                status_updated: 'sync',
+                assigned: 'user',
+                completed: 'check',
+                rejected: 'times'
+            };
+            return icons[action] || 'circle';
+        }
+    </script>
+</body>
+</html>
